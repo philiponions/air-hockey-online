@@ -79,8 +79,14 @@ function sendTimer(room) {
     delete rooms[room.id];
   }
 }
-
+let lastLoop = Date.now();
 function gameLoop(room) {
+
+  const now = Date.now();
+  const delta = now - lastLoop;
+  if (delta > 20) console.log(`Loop delay: ${delta}ms`);
+  lastLoop = now;
+
   room.frameCount++;
   const puck = room.puck;
   puck.x += puck.vx;
