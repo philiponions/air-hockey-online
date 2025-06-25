@@ -212,6 +212,13 @@ function setupSocketHandlers() {
   });
 }
 
+setInterval(() => {
+  const start = Date.now();
+  socket.emit('pingCheck', () => {
+    console.log("Ping:", Date.now() - start, "ms");
+  });
+}, 2000);
+
 // Drawing logic
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);

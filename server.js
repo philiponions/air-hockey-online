@@ -311,6 +311,10 @@ function extractPlayerData(player) {
 io.on('connection', (socket) => {
   console.log('Player connected:', socket.id);
 
+  socket.on('pingCheck', (cb) => {
+    cb(); // Just call back immediately
+  });
+
   socket.on('joinAsSpectator', (roomId) => {
     const room = rooms[roomId];
     if (!room) {
