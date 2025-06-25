@@ -80,12 +80,27 @@ function sendTimer(room) {
   }
 }
 let lastLoop = Date.now();
+let totalDelay = 0;
+let loopCount = 0;
+
+
 function gameLoop(room) {
 
-  const now = Date.now();
-  const delta = now - lastLoop;
-  if (delta > 20) console.log(`Loop delay: ${delta}ms`);
+   const now = Date.now();
+  const delay = now - lastLoop;
   lastLoop = now;
+
+  totalDelay += delay;
+  loopCount++;
+
+  // Log average every 5 seconds or so
+  if (loopCount % 300 === 0) {  // 60 FPS x 5 seconds = 300
+    const avgDelay = totalDelay / loopCount;
+    console.log(`Average loop delay: ${avgDelay.toFixed(2)} ms over ${loopCount} loops`);
+    // Reset
+    totalDelay = 0;
+    loopCount = 0;
+  }
 
   room.frameCount++;
   const puck = room.puck;
