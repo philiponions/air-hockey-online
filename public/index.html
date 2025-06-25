@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Air Hockey</title>
+  <style>
+    canvas {
+      background: #0c0c0c;
+      display: block;
+      margin: 0 auto;
+      cursor: none;
+    }
+    
+  </style>
+</head>
+<body>
+   <!-- Landing screen -->
+   <div id="landing-screen">
+    <h1>Welcome to Air Hockey!</h1>
+
+    <button id="play-btn">🎮 Quick Match</button>
+  
+    <div id="lobby-actions">
+      <input id="room-code-input" placeholder="Enter Room Code">
+      <div>
+        <button id="create-btn">➕ Create Lobby</button>
+        <button id="join-btn">🔗 Join Lobby</button>
+        <button id="watch-btn">👀 Watch Game</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-screen" style="display:none;">
+    <h1 id="game-title">⚡ Air Hockey Online ⚡</h1>
+    <div id="room-code-display" onclick="copyRoomCode()" title="Click to copy" style="cursor: pointer; text-align:center; margin: 10px 0; color: #00ffff; font-weight: bold;"></div>
+    <div id="game-status">
+      <div id="scoreboard">TOP: 0 &nbsp;&nbsp; | &nbsp;&nbsp; BOTTOM: 0</div>
+      <div id="status-message">Waiting for opponent...</div>
+      <div id="timer">03:00</div>
+
+    </div>
+  
+    <canvas id="gameCanvas" width="600" height="800"></canvas>
+    <div id="chat-container">
+      <div id="chat-box"></div>
+      <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+  
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #lobby-actions {
+      margin-top: 30px;
+    }
+
+    #room-code-input {
+      width: calc(100% - 20px);
+      padding: 12px;
+      font-size: 1rem;
+      background: #111;
+      color: #00ffff;
+      border: 2px solid #00ffff55;
+      border-radius: 8px;
+      outline: none;
+      margin-bottom: 15px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    #room-code-input::placeholder {
+      color: #888;
+    }
+
+    #lobby-actions button {
+      padding: 12px 20px;
+      margin: 0 5px;
+      background: linear-gradient(135deg, #0077ff, #00ffff);
+      border: none;
+      border-radius: 30px;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 3px 10px #00ffff88;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    #lobby-actions button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px #00ffffcc;
+    }
+
+    /* Container for both screens */
+    #landing-screen, #game-screen {
+      width: 640px;
+      padding: 20px;
+      box-sizing: border-box;
+      background: #1e1e1e;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #00ffff33;
+    }
+
+    /* Landing screen styles */
+    #landing-screen {
+      text-align: center;
+    }
+
+    #landing-screen h1 {
+      margin-bottom: 40px;
+      font-weight: 700;
+      font-size: 2.4rem;
+      color: #00ffff;
+    }
+
+    #play-btn {
+      font-size: 1.2rem;
+      padding: 15px 40px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00ffff, #0077ff);
+      border: none;
+      border-radius: 40px;
+      color: #121212;
+      font-weight: 700;
+      box-shadow: 0 5px 15px #00ffffbb;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #play-btn:hover {
+      background: linear-gradient(135deg, #00bfff, #005fcc);
+      box-shadow: 0 8px 20px #00bbffdd;
+    }
+
+    #timer {
+      text-align: center;
+      color: #ccc;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    #game-status {
+      text-align: center;
+      color: #ccc;
+      font-family: 'Segoe UI', sans-serif;
+      margin-bottom: 10px;
+    }
+
+    #scoreboard {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    #status-message {
+      font-size: 14px;
+      color: #888;
+    }
+
+    #game-title {
+    text-align: center;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 20px 0 10px;
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+
+    body {
+      background: #000;
+    }
+    #chat-container {
+      width: 600px;
+      margin: 10px auto;
+      font-family: sans-serif;
+    }
+  
+    #chat-box {
+      height: 150px;
+      border: 1px solid #444;
+      background: #111;
+      color: white;
+      padding: 5px;
+      overflow-y: scroll;
+      font-size: 14px;
+    }
+  
+    #chat-form {
+      display: flex;
+      margin-top: 5px;
+    }
+  
+    #chat-input {
+      flex: 1;
+      padding: 5px;
+      background: #222;
+      color: white;
+      border: 1px solid #555;
+    }
+  
+    #chat-form button {
+      padding: 5px 10px;
+      background: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+  <script src="constants.js"></script>
+</body>
+</html>
