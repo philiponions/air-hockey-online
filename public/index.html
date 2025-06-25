@@ -19,7 +19,7 @@
 
     <button id="play-btn">🎮 Quick Match</button>
   
-    <div id="lobby-actions">
+    <div class="lobby-actions">
       <input id="room-code-input" placeholder="Enter Room Code">
       <div>
         <button id="create-btn">➕ Create Lobby</button>
@@ -35,8 +35,13 @@
     <div id="game-status">
       <div id="scoreboard">TOP: 0 &nbsp;&nbsp; | &nbsp;&nbsp; BOTTOM: 0</div>
       <div id="status-message">Waiting for opponent...</div>
+      <div id="system-message"></div>
       <div id="timer">03:00</div>
 
+    </div>
+
+    <div class="lobby-actions">
+      <button id="back-btn" disabled>Back</button> <!-- Add Back button here -->
     </div>
   
     <canvas id="gameCanvas" width="600" height="800"></canvas>
@@ -66,6 +71,18 @@
     #lobby-actions {
       margin-top: 30px;
     }
+    
+    #back-btn {
+      margin-bottom: 10px;
+    }
+
+    #back-btn:disabled {
+        background-color: grey;
+        color: #ccc;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
 
     #room-code-input {
       width: calc(100% - 20px);
@@ -85,7 +102,7 @@
       color: #888;
     }
 
-    #lobby-actions button {
+    .lobby-actions button {
       padding: 12px 20px;
       margin: 0 5px;
       background: linear-gradient(135deg, #0077ff, #00ffff);
@@ -99,7 +116,7 @@
       transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
 
-    #lobby-actions button:hover {
+    .lobby-actions button:hover {
       transform: scale(1.05);
       box-shadow: 0 5px 15px #00ffffcc;
     }
@@ -137,6 +154,7 @@
       font-weight: 700;
       box-shadow: 0 5px 15px #00ffffbb;
       transition: background 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 20px;
     }
 
     #play-btn:hover {
@@ -167,6 +185,11 @@
     #status-message {
       font-size: 14px;
       color: #888;
+    }
+
+    #system-message {
+      font-size: 16px;
+      color: red;
     }
 
     #game-title {

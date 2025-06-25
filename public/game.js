@@ -9,12 +9,37 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreboard = document.getElementById('scoreboard');
 const statusMessage = document.getElementById('status-message');
+const systemMessage = document.getElementById('system-message');
 const timerEl = document.getElementById('timer');
 const chatBox = document.getElementById('chat-box');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
 let isSpectator = false;
+
+const backBtn = document.getElementById('back-btn');
+
+backBtn.addEventListener('click', () => {
+  if (socket) {
+    socket.disconnect();  // Leave the game room on server
+  }
+  // Show landing screen, hide game screen
+  document.getElementById('landing-screen').style.display = 'block';
+  document.getElementById('game-screen').style.display = 'none';
+
+  // Reset any game UI state here if needed
+});
+
+
+// Initially disabled, enable if waiting for opponent (game not started)
+function updateBackButton(statusMsg) {
+  if (statusMsg === 'Waiting for opponent...') {
+    backBtn.disabled = false;
+  } else {
+    backBtn.disabled = true;
+  }
+}
+
 
 // Triggered when user clicks "Watch Game" (e.g., from a lobby or URL)
 document.getElementById('watch-btn')?.addEventListener('click', () => {
@@ -123,6 +148,11 @@ function setupSocketHandlers() {
 
   socket.on('statusMessage', (msg) => {
     statusMessage.textContent = msg;
+    updateBackButton(msg);
+  });
+
+  socket.on('systemMessage', (msg) => {
+    systemMessage.textContent = msg;
   });
 
   socket.on('timer', (msRemaining) => {

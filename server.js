@@ -35,7 +35,9 @@ function createRoom() {
     puckHitCooldown: 0,
     private: false,
     frameCount: 0,
-    spectators: {}
+    spectators: {},
+    puckSide: null,
+    puckSideTime: null,
   };
   return rooms[roomId];
 }
@@ -112,6 +114,70 @@ function gameLoop(room) {
     if (puck.x < (GOAL_POS_X - GOAL_WIDTH / 2) || puck.x > (GOAL_POS_X + GOAL_WIDTH / 2)) {
       puck.vy *= -1; // Bounce back
       puck.y = 800 - GOAL_DEPTH; // Prevent puck from sticking in wall
+    }
+  }
+
+  const currentSide = room.puck.y < 400 ? 'top' : 'bottom'; // assuming 800px height
+
+  if (room.puckSide !== currentSide) {
+    // Puck crossed to the other side — reset timer
+    room.puckSide = currentSide;
+    room.puckSideTime = Date.now();
+
+    const offender = Object.values(room.players).find(p => p.side !== currentSide);
+      if (offender && offender.socket) {
+        offender.socket.emit(
+          'systemMessage',
+          ``
+        );
+      }
+
+  } else {
+    // Check if puck has overstayed
+    const HOLD_LIMIT = 8000; // 8 seconds
+    const now = Date.now();
+    const timeStayed = room.puckSideTime && now - room.puckSideTime;
+
+    if (timeStayed > 3000) {
+      const offender = Object.values(room.players).find(p => p.side === currentSide);
+      if (offender && offender.socket) {
+        offender.socket.emit(
+          'systemMessage',
+          `Don't stall! You will be penalized in ${Math.round((HOLD_LIMIT - timeStayed) / 1000)}s`
+        );
+      }
+    }
+
+    if (timeStayed > HOLD_LIMIT) {
+      // Penalize by giving puck to the other player
+      const offender = currentSide;
+      const winner = offender === 'top' ? 'bottom' : 'top';
+
+      io.to(room.id).emit(
+        'chatMessage',
+        `SYSTEM: ${offender.toUpperCase()} kept the puck too long! Possession given to ${winner.toUpperCase()}`
+      );
+      
+      const offendingPlayer = Object.values(room.players).find(p => p.side === currentSide);
+      if (offendingPlayer && offendingPlayer.socket) {
+        offendingPlayer.socket.emit(
+          'systemMessage',
+          `You were penalized!`
+        );
+      }
+
+      // Reset puck to the winner's side
+      room.puck = {
+        x: 300,
+        y: winner === 'top' ? 375 : 425,
+        vx: 0,
+        vy: winner === 'top' ? -3: 3,
+      };
+
+      // Reset cooldowns and timers
+      room.puckSide = null;
+      room.puckSideTime = Date.now();
+      room.warnedAboutStall = false;
     }
   }
 
@@ -332,7 +398,9 @@ io.on('connection', (socket) => {
         gameLoop: null,
         puckHitCooldown: 0,
         private: true,
-        spectators: {}
+        spectators: {},
+        puckSide: null,
+      puckSideTime: null,
       };
     }
 
